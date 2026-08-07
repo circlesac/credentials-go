@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "explicit credential wins",
+      "explicit_credential": "explicit-key",
+      "explicit_profile": "chosen",
+      "env": {
+        "CIRCLES_AUTH_TOKEN": "environment-key",
+        "CIRCLES_PROFILE": "environment-profile"
+      },
+      "profiles": {
+        "chosen": { "api_key": "chosen-key" },
+        "environment-profile": { "api_key": "environment-profile-key" },
+        "default": { "api_key": "default-key" }
+      },
+      "expected": {
+        "value": "explicit-key",
+        "kind": "api_key",
+        "source": { "type": "explicit" }
+      }
+    },
+    {
+      "name": "explicit profile wins over environment credential",
+      "explicit_profile": "chosen",
+      "env": { "CIRCLES_AUTH_TOKEN": "environment-key" },
+      "profiles": {
+        "chosen": { "api_key": "chosen-key" }
+      },
+      "expected": {
+        "value": "chosen-key",
+        "kind": "api_key",
+        "source": { "type": "profile", "profile": "chosen" }
+      }
+    },
+    {
+      "name": "explicit missing profile is terminal",
+      "explicit_profile": "missing",
+      "env": { "CIRCLES_AUTH_TOKEN": "environment-key" },
+      "profiles": {
+        "default": { "api_key": "default-key" }
+      },
+      "error": "CREDENTIAL_NOT_FOUND"
+    },
+    {
+      "name": "canonical environment credential wins",
+      "env": {
+        "CIRCLES_AUTH_TOKEN": "canonical-key",
+        "CRCL_AUTH_TOKEN": "compatibility-key",
+        "CIRCLES_PROFILE": "selected"
+      },
+      "expected": {
+        "value": "canonical-key",
+        "kind": "api_key",
+        "source": { "type": "environment" }
+      },
+      "expect_no_disk_write": true
+    },
+    {
+      "name": "compatibility environment credential is supported",
+      "env": { "CRCL_AUTH_TOKEN": "compatibility-key" },
+      "expected": {
+        "value": "compatibility-key",
+        "kind": "api_key",
+        "source": { "type": "environment" }
+      },
+      "expect_no_disk_write": true
+    },
+    {
+      "name": "canonical environment profile wins",
+      "env": {
+        "CIRCLES_PROFILE": "canonical",
+        "CRCL_PROFILE": "compatibility"
+      },
+      "profiles": {
+        "canonical": { "api_key": "canonical-profile-key" },
+        "compatibility": { "api_key": "compatibility-profile-key" }
+      },
+      "expected": {
+        "value": "canonical-profile-key",
+        "kind": "api_key",
+        "source": { "type": "profile", "profile": "canonical" }
+      }
+    },
+    {
+      "name": "compatibility environment profile is supported",
+      "env": { "CRCL_PROFILE": "compatibility" },
+      "profiles": {
+        "compatibility": { "api_key": "compatibility-profile-key" }
+      },
+      "expected": {
+        "value": "compatibility-profile-key",
+        "kind": "api_key",
+        "source": { "type": "profile", "profile": "compatibility" }
+      }
+    },
+    {
+      "name": "default profile is last",
+      "env": {},
+      "profiles": {
+        "default": { "api_key": "default-key" }
+      },
+      "expected": {
+        "value": "default-key",
+        "kind": "api_key",
+        "source": { "type": "profile", "profile": "default" }
+      }
+    },
+    {
+      "name": "empty canonical environment credential is terminal",
+      "env": {
+        "CIRCLES_AUTH_TOKEN": "",
+        "CRCL_AUTH_TOKEN": "compatibility-key"
+      },
+      "error": "INVALID_CREDENTIAL"
+    }
+  ]
+}

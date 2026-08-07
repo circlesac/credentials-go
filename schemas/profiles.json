@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "API key profile",
+      "profile": "automation",
+      "config": "[automation]\napi_url = https://api.circles.ac\norg = example\n",
+      "credentials": "[automation]\napi_key = automation-key\n",
+      "expected": {
+        "value": "automation-key",
+        "kind": "api_key",
+        "source": { "type": "profile", "profile": "automation" }
+      }
+    },
+    {
+      "name": "JWT profile",
+      "profile": "default",
+      "config": "[default]\nauth_url = https://auth.circles.ac\n",
+      "credentials": "[default]\naccess_token = eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJ2YWxpZCIsImV4cCI6NDEwMjQ0NDgwMH0.signature\nrefresh_token = refresh-value\n",
+      "expected": {
+        "value": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJ2YWxpZCIsImV4cCI6NDEwMjQ0NDgwMH0.signature",
+        "kind": "jwt",
+        "source": { "type": "profile", "profile": "default" }
+      }
+    },
+    {
+      "name": "ambiguous credential forms",
+      "profile": "default",
+      "credentials": "[default]\napi_key = opaque-key\naccess_token = eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJ2YWxpZCIsImV4cCI6NDEwMjQ0NDgwMH0.signature\n",
+      "error": "AMBIGUOUS_CREDENTIAL",
+      "secret_safe": ["opaque-key"]
+    },
+    {
+      "name": "missing selected profile",
+      "profile": "missing",
+      "credentials": "[default]\napi_key = default-key\n",
+      "error": "CREDENTIAL_NOT_FOUND"
+    },
+    {
+      "name": "duplicate profile declaration",
+      "profile": "default",
+      "credentials": "[default]\napi_key = first-secret\n\n[default]\napi_key = second-secret\n",
+      "error": "PROFILE_CONFLICT",
+      "secret_safe": ["first-secret", "second-secret"]
+    },
+    {
+      "name": "unsupported credential field",
+      "profile": "default",
+      "credentials": "[default]\npassword = hidden-secret\n",
+      "error": "INVALID_CREDENTIAL",
+      "secret_safe": ["hidden-secret"]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "expired JWT rotates both tokens",
+      "profile": "default",
+      "now_unix": 2000000000,
+      "auth_url": "https://issuer.example.test/",
+      "access_token": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJleHBpcmVkIiwiZXhwIjoxfQ.signature",
+      "refresh_token": "old-refresh",
+      "response_status": 200,
+      "response": {
+        "access_token": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJ2YWxpZCIsImV4cCI6NDEwMjQ0NDgwMH0.signature",
+        "refresh_token": "new-refresh"
+      },
+      "expected_request_url": "https://issuer.example.test/token",
+      "expected_client_id": "circles-api",
+      "expected_value": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJ2YWxpZCIsImV4cCI6NDEwMjQ0NDgwMH0.signature",
+      "expected_stored_refresh_token": "new-refresh"
+    },
+    {
+      "name": "refresh response may retain refresh token",
+      "profile": "default",
+      "now_unix": 2000000000,
+      "access_token": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJleHBpcmVkIiwiZXhwIjoxfQ.signature",
+      "refresh_token": "retained-refresh",
+      "response_status": 200,
+      "response": {
+        "access_token": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJ2YWxpZCIsImV4cCI6NDEwMjQ0NDgwMH0.signature"
+      },
+      "expected_request_url": "https://auth.circles.ac/token",
+      "expected_client_id": "circles-api",
+      "expected_value": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJ2YWxpZCIsImV4cCI6NDEwMjQ0NDgwMH0.signature",
+      "expected_stored_refresh_token": "retained-refresh"
+    },
+    {
+      "name": "rejected refresh has stable secret-safe error",
+      "profile": "default",
+      "now_unix": 2000000000,
+      "access_token": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJleHBpcmVkIiwiZXhwIjoxfQ.signature",
+      "refresh_token": "rejected-refresh-secret",
+      "response_status": 401,
+      "response": { "error": "invalid_grant", "echo": "rejected-refresh-secret" },
+      "error": "REFRESH_FAILED",
+      "secret_safe": ["rejected-refresh-secret"]
+    }
+  ]
+}

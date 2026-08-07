@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "stable_codes": [
+    "CREDENTIAL_NOT_FOUND",
+    "INVALID_CREDENTIAL",
+    "AMBIGUOUS_CREDENTIAL",
+    "REFRESH_FAILED",
+    "PROFILE_CONFLICT",
+    "CREDENTIAL_STORAGE_FAILED"
+  ],
+  "cases": [
+    {
+      "name": "invalid explicit value is secret-safe",
+      "explicit_credential": "do not echo this secret",
+      "error": "INVALID_CREDENTIAL",
+      "secret_safe": ["do not echo this secret"]
+    },
+    {
+      "name": "missing default profile is actionable",
+      "error": "CREDENTIAL_NOT_FOUND",
+      "message_contains": ["CIRCLES_AUTH_TOKEN", "crcl login"]
+    }
+  ]
+}

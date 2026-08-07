@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "current profile wins over legacy default",
+      "config": "[__circles__]\ncurrent_profile = prod:alice@example.com\n",
+      "profiles": {
+        "prod:alice@example.com": { "api_key": "example-key" },
+        "default": { "api_key": "default-key" }
+      },
+      "expected": {
+        "value": "example-key",
+        "kind": "api_key",
+        "source": { "type": "profile", "profile": "prod:alice@example.com" }
+      }
+    },
+    {
+      "name": "explicit profile wins over current profile",
+      "explicit_profile": "default",
+      "config": "[__circles__]\ncurrent_profile = prod:alice@example.com\n",
+      "profiles": {
+        "prod:alice@example.com": { "api_key": "example-key" },
+        "default": { "api_key": "default-key" }
+      },
+      "expected": {
+        "value": "default-key",
+        "kind": "api_key",
+        "source": { "type": "profile", "profile": "default" }
+      }
+    },
+    {
+      "name": "environment credential wins over current profile",
+      "env": { "CIRCLES_AUTH_TOKEN": "environment-key" },
+      "config": "[__circles__]\ncurrent_profile = prod:alice@example.com\n",
+      "profiles": {
+        "prod:alice@example.com": { "api_key": "example-key" }
+      },
+      "expected": {
+        "value": "environment-key",
+        "kind": "api_key",
+        "source": { "type": "environment" }
+      }
+    },
+    {
+      "name": "environment profile wins over current profile",
+      "env": { "CIRCLES_PROFILE": "default" },
+      "config": "[__circles__]\ncurrent_profile = prod:alice@example.com\n",
+      "profiles": {
+        "prod:alice@example.com": { "api_key": "example-key" },
+        "default": { "api_key": "default-key" }
+      },
+      "expected": {
+        "value": "default-key",
+        "kind": "api_key",
+        "source": { "type": "profile", "profile": "default" }
+      }
+    },
+    {
+      "name": "missing current profile is terminal",
+      "config": "[__circles__]\ncurrent_profile = missing@example.com\n",
+      "profiles": {
+        "default": { "api_key": "default-key" }
+      },
+      "error": "CREDENTIAL_NOT_FOUND"
+    },
+    {
+      "name": "absent current profile falls back to legacy default",
+      "profiles": {
+        "default": { "api_key": "default-key" }
+      },
+      "expected": {
+        "value": "default-key",
+        "kind": "api_key",
+        "source": { "type": "profile", "profile": "default" }
+      }
+    },
+    {
+      "name": "reserved metadata section cannot be selected",
+      "explicit_profile": "__circles__",
+      "config": "[__circles__]\ncurrent_profile = default\n",
+      "profiles": {
+        "default": { "api_key": "default-key" }
+      },
+      "error": "INVALID_CREDENTIAL"
+    }
+  ]
+}

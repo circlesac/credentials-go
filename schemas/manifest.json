@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "description": "Language-neutral executable cases for the Circles credential-provider contract.",
+  "files": [
+    "precedence.json",
+    "profiles.json",
+    "classification.json",
+    "refresh.json",
+    "migration.json",
+    "errors.json",
+    "selection.json"
+  ]
+}

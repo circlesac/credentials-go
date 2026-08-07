@@ -1,0 +1,34 @@
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version:
+          - 1.18.x
+          - stable
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: circlesac/credentials
+          path: credentials-spec
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: false
+      - run: diff -ru schemas credentials-spec/schemas
+      - run: go test ./...
+      - if: matrix.go-version == 'stable'
+        run: go test -race ./...
+      - run: go vet ./...

@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "JWT with numeric expiration",
+      "value": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJ2YWxpZCIsImV4cCI6NDEwMjQ0NDgwMH0.signature",
+      "expected": {
+        "kind": "jwt",
+        "expires_at_unix": 4102444800
+      }
+    },
+    {
+      "name": "JWT without expiration is invalid",
+      "value": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJuby1leHAifQ.signature",
+      "error": "INVALID_CREDENTIAL"
+    },
+    {
+      "name": "unsigned JWT is invalid",
+      "value": "eyJhbGciOiJub25lIn0.eyJzdWIiOiJ1bnNpZ25lZCIsImV4cCI6NDEwMjQ0NDgwMH0.signature",
+      "error": "INVALID_CREDENTIAL"
+    },
+    {
+      "name": "JWT without an algorithm is invalid",
+      "value": "eyJ0eXAiOiJKV1QifQ.eyJzdWIiOiJuby1hbGciLCJleHAiOjQxMDI0NDQ4MDB9.signature",
+      "error": "INVALID_CREDENTIAL"
+    },
+    {
+      "name": "opaque API key",
+      "value": "circles_opaque_key",
+      "expected": {
+        "kind": "api_key"
+      }
+    },
+    {
+      "name": "three opaque segments are not a JWT",
+      "value": "not-json.still-not-json.signature",
+      "expected": {
+        "kind": "api_key"
+      }
+    },
+    {
+      "name": "JWT expiration must be numeric",
+      "value": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJiYWQtZXhwIiwiZXhwIjoibGF0ZXIifQ.signature",
+      "error": "INVALID_CREDENTIAL"
+    },
+    {
+      "name": "whitespace is invalid",
+      "value": "secret value",
+      "error": "INVALID_CREDENTIAL",
+      "secret_safe": true
+    }
+  ]
+}

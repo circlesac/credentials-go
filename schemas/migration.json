@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "legacy-only named profiles are imported",
+      "legacy_config": "[default]\norg = example\n\n[dev]\napi_url = http://localhost:8787\n",
+      "legacy_credentials": "[default]\napi_key = legacy-default-key\n\n[dev]\napi_key = legacy-dev-key\n",
+      "profile": "dev",
+      "expected_value": "legacy-dev-key",
+      "expected_profiles": ["default", "dev"],
+      "repeat": true,
+      "preserve_legacy": true
+    },
+    {
+      "name": "canonical profile wins while another legacy profile imports",
+      "canonical_credentials": "[default]\napi_key = canonical-key\n",
+      "legacy_credentials": "[default]\napi_key = legacy-key\n\n[dev]\napi_key = legacy-dev-key\n",
+      "profile": "default",
+      "expected_value": "canonical-key",
+      "expected_profiles": ["default", "dev"],
+      "forbidden_canonical_values": ["legacy-key"],
+      "preserve_legacy": true
+    },
+    {
+      "name": "legacy config JSON account is imported",
+      "legacy_json": {
+        "accounts": {
+          "person@example.test [json]": {
+            "api_key": "json-key",
+            "auth_url": "https://issuer.example.test",
+            "orgs": {
+              "1": { "slug": "json-org", "default": true }
+            }
+          }
+        }
+      },
+      "profile": "json",
+      "expected_value": "json-key",
+      "expected_profiles": ["json"],
+      "preserve_legacy": true
+    }
+  ]
+}
